@@ -2,6 +2,7 @@ from tabulate import tabulate   # needs pip install tablulate
 import os  # import operating system routines
 import src.gui as gui
 from src.api import RequestInfo, RequestParameters
+from src.config import Configuration as conf
 
 
 class TextTable:
@@ -210,28 +211,33 @@ class UserInterface:
             print("Number of days must be a number!")
 
     def updateSettings(self):
-        file_content = "tu=" + self.TEMPERATURE_UNIT + \
-            " " + "days=" + str(self.FORECAST_SPAN)
-        path = os.path.normcase("./conf/settings.sf")
-        f = open(path, "w")
-        f.write(file_content)
-        f.close()
+        conf().updateSettings(temp_unit=self.TEMPERATURE_UNIT,
+                            forecast_span=self.FORECAST_SPAN)
+        # file_content = "tu=" + self.TEMPERATURE_UNIT + \
+        #     " " + "days=" + str(self.FORECAST_SPAN)
+        # path = os.path.normcase("./conf/settings.sf")
+        # f = open(path, "w")
+        # f.write(file_content)
+        # f.close()
         print("Settings have been updated!")
 
     # Read settings from the file
     def getSettings(self):
-        try:
-            path = os.path.normcase("./conf/settings.sf")
-            f = open(path, "r")
-            file_content = f.read()
-            split_content = file_content.split(" ")
-            tu = split_content[0].split("=")
-            days = split_content[1].split("=")
-            self.TEMPERATURE_UNIT = tu[1]
-            self.FORECAST_SPAN = int(days[1])
-        except FileNotFoundError:
-            # Create settings-file using default values
-            self.updateSettings()
+        data = conf().getSettings()
+        self.TEMPERATURE_UNIT = data['temperature_unit']
+        self.FORECAST_SPAN = data['forecast_span']
+        # try:
+        #     path = os.path.normcase("./conf/settings.sf")
+        #     f = open(path, "r")
+        #     file_content = f.read()
+        #     split_content = file_content.split(" ")
+        #     tu = split_content[0].split("=")
+        #     days = split_content[1].split("=")
+        #     self.TEMPERATURE_UNIT = tu[1]
+        #     self.FORECAST_SPAN = int(days[1])
+        # except FileNotFoundError:
+        #     # Create settings-file using default values
+        #     self.updateSettings()
 
     def printSwitchBoard(self):
         swtich_board = []
